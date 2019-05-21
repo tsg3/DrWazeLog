@@ -40,6 +40,9 @@ inversa([H1|T1],L2,L3):- inversa(T1,[H1|L2],L3).
 miembro(Elemento, [Elemento|_]).
 miembro(Elemento, [_|Cola]):- miembro(Elemento, Cola).
 
+:- dynamic
+	rpath/2.
+
 rpath([target|reversed_path], distance).
 
 shorterPath([H|Path], Dist) :-

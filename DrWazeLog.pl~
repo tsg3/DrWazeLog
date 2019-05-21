@@ -63,7 +63,7 @@ traverse(_).
 
 go(From, To) :-
 	traverse(From),
-	rpath([To|RPath], Dist) -> inversa([To|RPath], Path), Distance is round(Dist), writef('Shortest path is %w with distance %w = %w\n', [Path, Dist, Distance]).
+	rpath([To|RPath], Dist), inversa([To|RPath], Path), Distance is round(Dist), writef('Shortest path is %w with distance %w = %w\n', [Path, Dist, Distance]).
 
 go(From, To) :- writef('There is no route from %w to %w\n', [From, To]).
 
