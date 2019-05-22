@@ -56,27 +56,18 @@ ruta(cachi, orosi, 12).
 %		   inicial y el final y la retorna al cliente en la
 %		   consola
 
-viajar(Inicio, Final):-
+viajar(Inicio, Final, Ruta, CostoSumado):-
 	recorrer(Inicio),
 	rutaInversa([Final|RutaInversa], Costo),
 	inversa([Final|RutaInversa], Ruta),
-	CostoSumado is round(Costo),
-	write('La mejor ruta para ir desde '),
-	write(Inicio),
-	write(' hasta '),
-	write(Final),
-	write(' es '),
-	escribirRuta(Ruta),
-	write(', con un costo de '),
-	write(CostoSumado),
-	write(' horas.\n').
+	CostoSumado is round(Costo).
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
 % Descripción : Tendrá éxito si no encuentra alguna ruta entre el punto
 %		   inicial y el final e imprime el error en la consola
 
-viajar(Inicio, Final):-
+viajar(Inicio, Final, _, _):-
 	write('No hay rutas para ir desde '),
 	write(Inicio),
 	write(' hasta '),
@@ -87,8 +78,21 @@ viajar(Inicio, Final):-
 %               Final -> Punto de llegada en el mapa
 % Descripción : Condición de parada para 'viajar' con puntos intermedios
 
-viajar(Inicio, [], Final):-
-	viajar(Inicio, Final).
+viajar(Inicio, [], Final, X, W):-
+	viajar(Inicio, Final, Y, V),
+	%concatenar(X,Y,Z),
+	inversa(X,[_|IT]), inversa(IT,X1),
+	concatenar(X1,Y,Z),
+	CostoSumado is round(V + W),
+	write('La mejor ruta para ir desde '),
+	write(Inicio),
+	write(' hasta '),
+	write(Final),
+	write(' es '),
+	escribirRuta(Z),
+	write(', con un costo de '),
+	write(CostoSumado),
+	write(' horas.\n').
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Siguiente -> Primer punto intermedio en el viaje
@@ -99,9 +103,14 @@ viajar(Inicio, [], Final):-
 %	           punto intermedio, etc; y si existe una ruta entre el
 %	           último punto intermedio y el punto de llegada.
 
-viajar(Inicio, [Siguiente|Demas], Final):-
-	viajar(Inicio, Siguiente),
-	viajar(Siguiente, Demas, Final).
+viajar(Inicio, [Siguiente|Demas], Final, X, W):-
+	viajar(Inicio, Siguiente, Y, V),
+	inversa(X,[_|IT]), inversa(IT,X1),
+	concatenar(X1,Y,Z),
+	viajar(Siguiente, Demas, Final, Z, round(V + W)).
+
+concatenar([],X,X).
+concatenar([A|X],Y,[A|Z]):- concatenar(X,Y,Z).
 
 % Regla       : recorrer
 

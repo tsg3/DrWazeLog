@@ -56,27 +56,18 @@ ruta(cachi, orosi, 12).
 %		   inicial y el final y la retorna al cliente en la
 %		   consola
 
-viajar(Inicio, Final):-
+viajar(Inicio, Final, Ruta, CostoSumado):-
 	recorrer(Inicio),
 	rutaInversa([Final|RutaInversa], Costo),
 	inversa([Final|RutaInversa], Ruta),
-	CostoSumado is round(Costo),
-	write('La mejor ruta para ir desde '),
-	write(Inicio),
-	write(' hasta '),
-	write(Final),
-	write(' es '),
-	escribirRuta(Ruta),
-	write(', con un costo de '),
-	write(CostoSumado),
-	write(' horas.\n').
+	CostoSumado is round(Costo).
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
 % Descripción : Tendrá éxito si no encuentra alguna ruta entre el punto
 %		   inicial y el final e imprime el error en la consola
 
-viajar(Inicio, Final):-
+viajar(Inicio, Final, _, _):-
 	write('No hay rutas para ir desde '),
 	write(Inicio),
 	write(' hasta '),
@@ -87,8 +78,19 @@ viajar(Inicio, Final):-
 %               Final -> Punto de llegada en el mapa
 % Descripción : Condición de parada para 'viajar' con puntos intermedios
 
-viajar(Inicio, [], Final):-
-	viajar(Inicio, Final).
+viajar(Inicio, [], Final, X, W):-
+	viajar(Inicio, Final, Y, V),
+	concatenar(X,Y,Z),
+	CostoSumado is round(V + W),
+	write('La mejor ruta para ir desde '),
+	write(Inicio),
+	write(' hasta '),
+	write(Final),
+	write(' es '),
+	escribirRuta(Z),
+	write(', con un costo de '),
+	write(CostoSumado),
+	write(' horas.\n').
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Siguiente -> Primer punto intermedio en el viaje
@@ -99,9 +101,13 @@ viajar(Inicio, [], Final):-
 %	           punto intermedio, etc; y si existe una ruta entre el
 %	           último punto intermedio y el punto de llegada.
 
-viajar(Inicio, [Siguiente|Demas], Final):-
-	viajar(Inicio, Siguiente),
-	viajar(Siguiente, Demas, Final).
+viajar(Inicio, [Siguiente|Demas], Final, X, W):-
+	viajar(Inicio, Siguiente, Y, V),
+	concatenar(X,Y,Z),
+	viajar(Siguiente, Demas, Final, Z, round(V + W)).
+
+concatenar([],X,X).
+concatenar([A|X],Y,[A|Z]):- concatenar(X,Y,Z).
 
 % Regla       : recorrer
 
@@ -159,7 +165,10 @@ miembro(Elemento, [_|Cola]):- miembro(Elemento, Cola).
 %		   corta de la existente
 %		Ruta -> Camino seguido hasta el nodo actual que se está
 %		   actualizando
-% Descripción :
+% Descripción : Si existe alguna ruta hasta el nodo actual en la base
+%		   de datos, se sobreescribe por esta nueva ruta si el
+%		   costo de la ruta actual es menor a la de la ruta
+%		   guardada
 
 rutaMasCorta([Primer|Ruta], Costo):-
 	rutaInversa([Primer|_], CostoEncontrado), !,
@@ -167,23 +176,65 @@ rutaMasCorta([Primer|Ruta], Costo):-
         retract(rutaInversa([Primer|_], _)),
 	assert(rutaInversa([Primer|Ruta], Costo)).
 
-% Entradas    : Ruta ->
-%               Costo ->
-%
-% Descripción :
+% Entradas    : Ruta -> Ruta seguida hasta llegar al nodo actual
+%               Costo -> Costo total de la ruta correspondiente
+% Descripción : Añade la actual ruta a la base de datos dinámicas de las
+%                  rutas más cortas
 
 rutaMasCorta(Ruta, Costo):-
 	assert(rutaInversa(Ruta,Costo)).
 
+% Regla       : inversa
+
+% Entradas    : Lista1, Lista2 -> Listas que son inversas la una con la
+%                  otra
+% Descripción : Inicia el análisis para verificar si las listas son
+%                  inversas
+
 inversa(Lista1, Lista2):- inversa(Lista1, [], Lista2).
+
+% Entradas    : Lista -> Lista de elementos
+% Descripción : Condición de parada para la regla 'inversa'. Tendrá
+%		   éxito cuando la lista en el segundo y tercer
+%		   parámetro sean iguales y la primer lista sea vacía
+
 inversa([], Lista, Lista).
+
+% Entradas    : Primer1 -> Cabeza de la primer lista
+%               Cola1 -> Cola de la primer lista
+%               Lista2 -> Segunda lista
+%               Lista3 -> Tercer lista
+% Descripción : Verifica la regla 'inversa' usando de primer lista la
+%		   primer cola original; de segunda la concatenación de
+%		   la primer cabeza y la segunda lista original; y como
+%		   la tercer lista la tercer lista original.
+
 inversa([Primer1|Cola1], Lista2, Lista3):- inversa(Cola1, [Primer1|Lista2], Lista3).
+
+% Regla       : escribirRuta
+% Entradas    : Primer -> Punto de partida de la ruta actual
+%               Ruta -> Ruta que se debe seguir para llegar al destino
+% Descripción : Inicia la impresión de la ruta con el primer nodo
 
 escribirRuta([Primer|Ruta]):-
 	write(Primer),
 	escribirRutaAux(Ruta).
 
+% Regla       : escribirRutaAux
+
+% Entradas    : Su argumento debe ser una lista vacía
+% Descripción : Finaliza la impresión de una ruta. Condición de parada
+%                  para 'escribirRuta'
+
 escribirRutaAux([]):- write('').
+
+% Entradas    : Siguiente -> Nodo siguiente al último nodo impreso en
+%                  consola
+%		Ruta -> Resto de la ruta que hace falta imprimir
+% Descripción : Imprime los demás elementos de una ruta mediante
+%		   recursión despuésde haber impreso el punto de partida
+%		   ('escrbirRuta')
+
 escribirRutaAux([Siguiente|Ruta]):-
 	write(' -> '),
 	write(Siguiente),
