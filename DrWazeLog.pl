@@ -1,3 +1,23 @@
+% Hecho       : rutaInversa
+% Descripción : Es un hecho dinámico usado para guardar las rutas con
+%                  menos costo entre los nodos del grafo
+
+:- dynamic
+	rutaInversa/2.
+
+% Regla       : verRutasCortas
+% Entradas    : RutaInversa -> Lista de la ruta con nodos del grafo
+%               Costo -> Sumatoria de los costos de la ruta
+% Descripción : Tendrá éxito si la ruta inversa dada junto a su costo es
+%                  un hecho en la base de datos dinámica
+
+verRutasCortas(RutaInversa,Costo):-
+	rutaInversa(RutaInversa,Costo).
+
+% Hecho       : ruta
+% Descripción : Representa todas las direcciones (arcos) disponibles
+%                  entre los lugares del mapa y su respectivo costo.
+
 ruta(cartago, paraiso, 10).
 ruta(cartago, pacayas, 13).
 ruta(cartago, tres_rios, 8).
@@ -28,35 +48,13 @@ ruta(cachi, cervantes, 7).
 ruta(cachi, paraiso, 10).
 ruta(cachi, orosi, 12).
 
-inversa(Lista1, Lista2):- inversa(Lista1, [], Lista2).
-inversa([], Lista, Lista).
-inversa([Primer1|Cola1], Lista2, Lista3):- inversa(Cola1, [Primer1|Lista2], Lista3).
+% Regla       : viajar
 
-miembro(Elemento, [Elemento|_]).
-miembro(Elemento, [_|Cola]):- miembro(Elemento, Cola).
-
-:- dynamic
-	rutaInversa/2.
-
-rutaInversa([final|rutaInversa], costo).
-
-rutaMasCorta([Primer|Ruta], Costo):-
-	rutaInversa([Primer|_], CostoEncontrado), !,
-	Costo < CostoEncontrado,
-        retract(rutaInversa([Primer|_], _)),
-	assert(rutaInversa([Primer|Ruta], Costo)).
-rutaMasCorta(Ruta, Costo):-
-	assert(rutaInversa(Ruta,Costo)).
-
-recorrer(Inicio, Ruta, Costo):-
-	ruta(Inicio, RutaEncontrada, CostoEncontrada),
-	not(miembro(RutaEncontrada, Ruta)),
-	rutaMasCorta([RutaEncontrada, Inicio|Ruta], Costo + CostoEncontrada),
-	recorrer(RutaEncontrada, [Inicio|Ruta], Costo + CostoEncontrada).
-recorrer(Inicio):-
-	retractall(rutaInversa(_, _)),
-	recorrer(Inicio, [], 0).
-recorrer(_).
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Final -> Punto de llegada en el mapa
+% Descripción : Tendrá éxito si encuentra alguna ruta entre el punto
+%		   inicial y el final y la retorna al cliente en la
+%		   consola
 
 viajar(Inicio, Final):-
 	recorrer(Inicio),
@@ -72,6 +70,12 @@ viajar(Inicio, Final):-
 	write(', con un costo de '),
 	write(CostoSumado),
 	write(' horas.\n').
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Final -> Punto de llegada en el mapa
+% Descripción : Tendrá éxito si no encuentra alguna ruta entre el punto
+%		   inicial y el final e imprime el error en la consola
+
 viajar(Inicio, Final):-
 	write('No hay rutas para ir desde '),
 	write(Inicio),
@@ -79,9 +83,154 @@ viajar(Inicio, Final):-
         write(Final),
 	write(' .\n').
 
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Final -> Punto de llegada en el mapa
+% Descripción : Condición de parada para 'viajar' con puntos intermedios
+
+viajar(Inicio, [], Final):-
+	viajar(Inicio, Final).
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Siguiente -> Primer punto intermedio en el viaje
+%               Demas -> Resto de puntos intermedios en el viaje
+%               Final -> Punto de llegada en el mapa
+% Descripción : Tendrá éxito si encuentra rutas entre el punto de inicio
+%	           y el primer punto intermedio, y este con el siguiente
+%	           punto intermedio, etc; y si existe una ruta entre el
+%	           último punto intermedio y el punto de llegada.
+
+viajar(Inicio, [Siguiente|Demas], Final):-
+	viajar(Inicio, Siguiente),
+	viajar(Siguiente, Demas, Final).
+
+% Regla       : recorrer
+
+% Entradas    : Inicio -> Punto actual en el mapa
+%               Ruta -> Camino seguido hasta el punto actual en el mapa
+%               Costo -> Costo de la ruta actual analizada
+% Descripción : Tendrá éxito y procederá a buscar las rutas más cortas
+%		   próximas al punto actual si existe algún punto
+%		   vecino al punto actual que no sea miembro de la ruta
+%		   ya analizada
+
+recorrer(Inicio, Ruta, Costo):-
+	ruta(Inicio, RutaEncontrada, CostoEncontrada),
+	not(miembro(RutaEncontrada, Ruta)),
+	rutaMasCorta([RutaEncontrada, Inicio|Ruta], Costo + CostoEncontrada),
+	recorrer(RutaEncontrada, [Inicio|Ruta], Costo + CostoEncontrada).
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+% Descripción : Limpia la base de datos e inicia el recorrido del mapa
+%                  para encontrar las nuevas rutas más cortas
+
+recorrer(Inicio):-
+	retractall(rutaInversa(_, _)),
+	recorrer(Inicio, [], 0).
+
+% Entradas    : Un elemento cualquiera (punto inicial por defecto)
+% Descripción : Punto de parada para el recorrido y el backtracking del
+%                  mapa en busca de las rutas más cortas
+
+recorrer(_).
+
+% Regla       : miembro
+
+% Entradas    : Inicio -> Elemento cualquiera que representa el primer
+%	           argumento y la cabeza de la lista en el segundo
+%	           argumento.
+% Descripción : Tendrá éxito si la cabeza de la
+%	           lista y el elemento solicitado son iguales
+
+
+miembro(Elemento, [Elemento|_]).
+
+% Entradas    : Elemento -> Elemento a encontrar en la lista
+%		Cola -> Cola de la lista en la que se quiere buscar el
+%		   elemento
+% Descripción : Vuelve a llamar a la regla miembro con la cola de la
+%		   lista como la nueva lista, hasta que esta sea nula o
+%		   su cabeza sea el elemento que se busca
+
+miembro(Elemento, [_|Cola]):- miembro(Elemento, Cola).
+
+% Regla       : rutaMasCorta
+
+% Entradas    : Primera -> Nodo del grafo al que va a buscar una ruta más
+%		   corta de la existente
+%		Ruta -> Camino seguido hasta el nodo actual que se está
+%		   actualizando
+% Descripción : Si existe alguna ruta hasta el nodo actual en la base
+%		   de datos, se sobreescribe por esta nueva ruta si el
+%		   costo de la ruta actual es menor a la de la ruta
+%		   guardada
+
+rutaMasCorta([Primer|Ruta], Costo):-
+	rutaInversa([Primer|_], CostoEncontrado), !,
+	Costo < CostoEncontrado,
+        retract(rutaInversa([Primer|_], _)),
+	assert(rutaInversa([Primer|Ruta], Costo)).
+
+% Entradas    : Ruta -> Ruta seguida hasta llegar al nodo actual
+%               Costo -> Costo total de la ruta correspondiente
+% Descripción : Añade la actual ruta a la base de datos dinámicas de las
+%                  rutas más cortas
+
+rutaMasCorta(Ruta, Costo):-
+	assert(rutaInversa(Ruta,Costo)).
+
+% Regla       : inversa
+
+% Entradas    : Lista1, Lista2 -> Listas que son inversas la una con la
+%                  otra
+% Descripción : Inicia el análisis para verificar si las listas son
+%                  inversas
+
+inversa(Lista1, Lista2):- inversa(Lista1, [], Lista2).
+
+% Entradas    : Lista -> Lista de elementos
+% Descripción : Condición de parada para la regla 'inversa'. Tendrá
+%		   éxito cuando la lista en el segundo y tercer
+%		   parámetro sean iguales y la primer lista sea vacía
+
+inversa([], Lista, Lista).
+
+% Entradas    : Primer1 -> Cabeza de la primer lista
+%               Cola1 -> Cola de la primer lista
+%               Lista2 -> Segunda lista
+%               Lista3 -> Tercer lista
+% Descripción : Verifica la regla 'inversa' usando de primer lista la
+%		   primer cola original; de segunda la concatenación de
+%		   la primer cabeza y la segunda lista original; y como
+%		   la tercer lista la tercer lista original.
+
+inversa([Primer1|Cola1], Lista2, Lista3):- inversa(Cola1, [Primer1|Lista2], Lista3).
+
+% Regla       : escribirRuta
+% Entradas    : Primer -> Punto de partida de la ruta actual
+%               Ruta -> Ruta que se debe seguir para llegar al destino
+% Descripción : Inicia la impresión de la ruta con el primer nodo
+
 escribirRuta([Primer|Ruta]):-
 	write(Primer),
 	escribirRutaAux(Ruta).
 
+% Regla       : escribirRutaAux
+
+% Entradas    : Su argumento debe ser una lista vacía
+% Descripción : Finaliza la impresión de una ruta. Condición de parada
+%                  para 'escribirRuta'
+
 escribirRutaAux([]):- write('').
-escribirRutaAux(Ruta):- write(' -> '), escribirRuta(Ruta).
+
+% Entradas    : Siguiente -> Nodo siguiente al último nodo impreso en
+%                  consola
+%		Ruta -> Resto de la ruta que hace falta imprimir
+% Descripción : Imprime los demás elementos de una ruta mediante
+%		   recursión despuésde haber impreso el punto de partida
+%		   ('escrbirRuta')
+
+escribirRutaAux([Siguiente|Ruta]):-
+	write(' -> '),
+	write(Siguiente),
+	escribirRutaAux(Ruta).
+
