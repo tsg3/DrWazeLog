@@ -28,46 +28,60 @@ ruta(cachi, cervantes, 7).
 ruta(cachi, paraiso, 10).
 ruta(cachi, orosi, 12).
 
-camino(X,Y,Z):- ruta(X,Y,Z).
-
-concatenar([],L,L).
-concatenar([X|L1],L2,[X|L3]):- concatenar(L1,L2,L3).
-
-inversa(L1,L2):- inversa(L1,[],L2).
-inversa([],L,L).
-inversa([H1|T1],L2,L3):- inversa(T1,[H1|L2],L3).
+inversa(Lista1, Lista2):- inversa(Lista1, [], Lista2).
+inversa([], Lista, Lista).
+inversa([Primer1|Cola1], Lista2, Lista3):- inversa(Cola1, [Primer1|Lista2], Lista3).
 
 miembro(Elemento, [Elemento|_]).
 miembro(Elemento, [_|Cola]):- miembro(Elemento, Cola).
 
 :- dynamic
-	rpath/2.
+	rutaInversa/2.
 
-rpath([target|reversed_path], distance).
+rutaInversa([final|rutaInversa], costo).
 
-shorterPath([H|Path], Dist) :-
-	rpath([H|_], D), !, Dist < D,
-        retract(rpath([H|_],_)),
-	assert(rpath([H|Path], Dist)).
-shorterPath(Path, Dist) :-
-	assert(rpath(Path,Dist)).
+rutaMasCorta([Primer|Ruta], Costo):-
+	rutaInversa([Primer|_], CostoEncontrado), !,
+	Costo < CostoEncontrado,
+        retract(rutaInversa([Primer|_], _)),
+	assert(rutaInversa([Primer|Ruta], Costo)).
+rutaMasCorta(Ruta, Costo):-
+	assert(rutaInversa(Ruta,Costo)).
 
-traverse(From, Path, Dist) :-
-	camino(From, T, D),
-	not(miembro(T, Path)),
-	shorterPath([T,From|Path], Dist+D),
-	traverse(T,[From|Path],Dist+D).
+recorrer(Inicio, Ruta, Costo):-
+	ruta(Inicio, RutaEncontrada, CostoEncontrada),
+	not(miembro(RutaEncontrada, Ruta)),
+	rutaMasCorta([RutaEncontrada, Inicio|Ruta], Costo + CostoEncontrada),
+	recorrer(RutaEncontrada, [Inicio|Ruta], Costo + CostoEncontrada).
+recorrer(Inicio):-
+	retractall(rutaInversa(_, _)),
+	recorrer(Inicio, [], 0).
+recorrer(_).
 
-traverse(From) :-
-	retractall(rpath(_,_)),
-	traverse(From,[],0).
+viajar(Inicio, Final):-
+	recorrer(Inicio),
+	rutaInversa([Final|RutaInversa], Costo),
+	inversa([Final|RutaInversa], Ruta),
+	CostoSumado is round(Costo),
+	write('La mejor ruta para ir desde '),
+	write(Inicio),
+	write(' hasta '),
+	write(Final),
+	write(' es '),
+	escribirRuta(Ruta),
+	write(', con un costo de '),
+	write(CostoSumado),
+	write(' horas.\n').
+viajar(Inicio, Final):-
+	write('No hay rutas para ir desde '),
+	write(Inicio),
+	write(' hasta '),
+        write(Final),
+	write(' .\n').
 
-traverse(_).
+escribirRuta([Primer|Ruta]):-
+	write(Primer),
+	escribirRutaAux(Ruta).
 
-go(From, To) :-
-	traverse(From),
-	rpath([To|RPath], Dist), inversa([To|RPath], Path), Distance is round(Dist), writef('Shortest path is %w with distance %w = %w\n', [Path, Dist, Distance]).
-
-go(From, To) :- writef('There is no route from %w to %w\n', [From, To]).
-
-
+escribirRutaAux([]):- write('').
+escribirRutaAux(Ruta):- write(' -> '), escribirRuta(Ruta).
