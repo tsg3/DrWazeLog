@@ -52,9 +52,10 @@ ruta(cachi, orosi, 12).
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
+%               Ruta -> Ruta recorrida desde el inicio al final
+%               CostoSumado -> Costo total de la ruta recorrida
 % Descripción : Tendrá éxito si encuentra alguna ruta entre el punto
-%		   inicial y el final y la retorna al cliente en la
-%		   consola
+%		   inicial y el final
 
 viajar(Inicio, Final, Ruta, CostoSumado):-
 	recorrer(Inicio),
@@ -72,24 +73,29 @@ viajar(Inicio, Final, _, _):-
 	write(Inicio),
 	write(' hasta '),
         write(Final),
-	write(' .\n').
+	write(' .\n'), !, fail.
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
-% Descripción : Condición de parada para 'viajar' con puntos intermedios
+%               Ruta -> Ruta recorrida con anterioridad
+%               Costo -> Costo de la ruta recorrida
+% Descripción : Condición de parada para viajar. Analiza la última ruta
+%		   para completar la ruta total más corta posible entre
+%		   los puntos inicio y final definidos al inicio de la
+%		   recursión. Si existe una ruta, la imprime en la
+%		   consola.
 
-viajar(Inicio, [], Final, X, W):-
-	viajar(Inicio, Final, Y, V),
-	%concatenar(X,Y,Z),
-	inversa(X,[_|IT]), inversa(IT,X1),
-	concatenar(X1,Y,Z),
-	CostoSumado is round(V + W),
+viajar(Inicio, [], Final, Ruta, Costo):-
+	viajar(Inicio, Final, RutaEncontrada, CostoEncontrado),
+	inversa(Ruta, [_|RutaInversa]), inversa(RutaInversa, UltimoLugar),
+	concatenar(UltimoLugar, RutaEncontrada, RutaTotal),
+	CostoSumado is round(CostoEncontrado + Costo),
 	write('La mejor ruta para ir desde '),
 	write(Inicio),
 	write(' hasta '),
 	write(Final),
 	write(' es '),
-	escribirRuta(Z),
+	escribirRuta(RutaTotal),
 	write(', con un costo de '),
 	write(CostoSumado),
 	write(' horas.\n').
@@ -98,19 +104,35 @@ viajar(Inicio, [], Final, X, W):-
 %               Siguiente -> Primer punto intermedio en el viaje
 %               Demas -> Resto de puntos intermedios en el viaje
 %               Final -> Punto de llegada en el mapa
+%               Ruta -> Ruta recorrida con anterioridad
+%               Costo -> Costo de la ruta recorrida
 % Descripción : Tendrá éxito si encuentra rutas entre el punto de inicio
 %	           y el primer punto intermedio, y este con el siguiente
 %	           punto intermedio, etc; y si existe una ruta entre el
 %	           último punto intermedio y el punto de llegada.
 
-viajar(Inicio, [Siguiente|Demas], Final, X, W):-
-	viajar(Inicio, Siguiente, Y, V),
-	inversa(X,[_|IT]), inversa(IT,X1),
-	concatenar(X1,Y,Z),
-	viajar(Siguiente, Demas, Final, Z, round(V + W)).
+viajar(Inicio, [Siguiente|Demas], Final, Ruta, Costo):-
+	viajar(Inicio, Siguiente, RutaEncontrada, CostoEncontrado),
+	inversa(Ruta, [_|RutaInversa]), inversa(RutaInversa, UltimoLugar),
+	concatenar(UltimoLugar, RutaEncontrada, RutaTotal),
+	viajar(Siguiente, Demas, Final, RutaTotal, round(CostoEncontrado + Costo)).
 
-concatenar([],X,X).
-concatenar([A|X],Y,[A|Z]):- concatenar(X,Y,Z).
+% Regla       : concatenar
+
+% Entradas    : Lista -> lista de elementos
+% Descripción : Tendrá éxito si la primer lista es vacía y las otras dos
+%                  listas son iguales
+
+concatenar([],Lista,Lista).
+
+% Entradas    : Elemento -> Primer elemento de las listas 1 y 3
+%		Resto1, Resto3 -> Colas de las listas 1 y 3
+%		Lista2 -> Lista de elementos
+% Descripción : Analiza 'concatenar' para la cola de la lista 1, la
+%		   lista 2 y la cola de la lista 3 si el primer elemento
+%		   de la lista 1 y 3 son iguales
+
+concatenar([Elemento|Resto1],Lista2,[Elemento|Resto3]):- concatenar(Resto1,Lista2,Resto3).
 
 % Regla       : recorrer
 
