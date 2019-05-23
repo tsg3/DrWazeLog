@@ -1,52 +1,52 @@
-% Hecho       : rutaInversa
+% Hecho       : rutaCorta
 % Descripción : Es un hecho dinámico usado para guardar las rutas con
 %                  menos costo entre los nodos del grafo
 
 :- dynamic
-	rutaInversa/2.
+	rutaCorta/2.
 
 % Regla       : verRutasCortas
-% Entradas    : RutaInversa -> Lista de la ruta con nodos del grafo
+% Entradas    : RutaCorta -> Lista de la ruta con nodos del grafo
 %               Costo -> Sumatoria de los costos de la ruta
-% Descripción : Tendrá éxito si la ruta inversa dada junto a su costo es
+% Descripción : Tendrá éxito si la ruta dada junto a su costo es
 %                  un hecho en la base de datos dinámica
 
-verRutasCortas(RutaInversa,Costo):-
-	rutaInversa(RutaInversa,Costo).
+verRutasCortas(RutaCorta,Costo):-
+	rutaCorta(RutaCorta,Costo).
 
 % Hecho       : ruta
 % Descripción : Representa todas las direcciones (arcos) disponibles
 %                  entre los lugares del mapa y su respectivo costo.
 
-ruta(cartago, paraiso, 10).
-ruta(cartago, pacayas, 13).
-ruta(cartago, tres_rios, 8).
-ruta(cartago, san_jose, 20).
-ruta(cartago, musgo_verde, 10).
-ruta(pacayas, cervantes, 8).
-ruta(pacayas, cartago, 13).
-ruta(pacayas, tres_rios, 15).
-ruta(cervantes, juan_vinas, 5).
-ruta(cervantes, cachi, 7).
-ruta(cervantes, pacayas, 8).
-ruta(turrialba, pacayas, 18).
-ruta(juan_vinas, turrialba, 4).
-ruta(paraiso, cervantes, 4).
-ruta(paraiso, cachi, 10).
-ruta(paraiso, orosi, 8).
-ruta(san_jose, corralillo, 22).
-ruta(san_jose, cartago, 20).
-ruta(tres_rios, san_jose, 8).
-ruta(musgo_verde, cartago, 10).
-ruta(musgo_verde, corralillo, 6).
-ruta(corralillo, musgo_verde, 6).
-ruta(corralillo, san_jose, 22).
-ruta(orosi, paraiso, 8).
-ruta(orosi, cachi, 12).
-ruta(cachi, turrialba, 40).
-ruta(cachi, cervantes, 7).
-ruta(cachi, paraiso, 10).
-ruta(cachi, orosi, 12).
+ruta("cartago", "paraiso", 10).
+ruta("cartago", "pacayas", 13).
+ruta("cartago", "tres_rios", 8).
+ruta("cartago", "san_jose", 20).
+ruta("cartago", "musgo_verde", 10).
+ruta("pacayas", "cervantes", 8).
+ruta("pacayas", "cartago", 13).
+ruta("pacayas", "tres_rios", 15).
+ruta("cervantes", "juan_vinas", 5).
+ruta("cervantes", "cachi", 7).
+ruta("cervantes", "pacayas", 8).
+ruta("turrialba", "pacayas", 18).
+ruta("juan_vinas", "turrialba", 4).
+ruta("paraiso", "cervantes", 4).
+ruta("paraiso", "cachi", 10).
+ruta("paraiso", "orosi", 8).
+ruta("san_jose", "corralillo", 22).
+ruta("san_jose", "cartago", 20).
+ruta("tres_rios", "san_jose", 8).
+ruta("musgo_verde", "cartago", 10).
+ruta("musgo_verde", "corralillo", 6).
+ruta("corralillo", "musgo_verde", 6).
+ruta("corralillo", "san_jose", 22).
+ruta("orosi", "paraiso", 8).
+ruta("orosi", "cachi", 12).
+ruta("cachi", "turrialba", 40).
+ruta("cachi", "cervantes", 7).
+ruta("cachi", "paraiso", 10).
+ruta("cachi", "orosi", 12).
 
 % Regla       : viajar
 
@@ -59,7 +59,8 @@ ruta(cachi, orosi, 12).
 
 viajar(Inicio, Final, Ruta, CostoSumado):-
 	recorrer(Inicio),
-	rutaInversa([Final|RutaInversa], Costo),
+	rutaCorta(RutaCorta, Costo),
+	inversa(RutaCorta,[Final|RutaInversa]),
 	inversa([Final|RutaInversa], Ruta),
 	CostoSumado is round(Costo).
 
@@ -155,7 +156,7 @@ recorrer(Inicio, Ruta, Costo):-
 %                  para encontrar las nuevas rutas más cortas
 
 recorrer(Inicio):-
-	retractall(rutaInversa(_, _)),
+	retractall(rutaCorta(_, _)),
 	recorrer(Inicio, [], 0).
 
 % Entradas    : Un elemento cualquiera (punto inicial por defecto)
@@ -196,10 +197,12 @@ miembro(Elemento, [_|Cola]):- miembro(Elemento, Cola).
 %		   guardada
 
 rutaMasCorta([Primer|Ruta], Costo):-
-	rutaInversa([Primer|_], CostoEncontrado), !,
+	rutaCorta(RutaCortaEncontrada, CostoEncontrado),
+	inversa(RutaCortaEncontrada, [Primer|_]), !,
 	Costo < CostoEncontrado,
-        retract(rutaInversa([Primer|_], _)),
-	assert(rutaInversa([Primer|Ruta], Costo)).
+        retract(rutaCorta(RutaCortaEncontrada, _)),
+	inversa([Primer|Ruta], NuevaRutaCorta),
+	assert(rutaCorta(NuevaRutaCorta, Costo)).
 
 % Entradas    : Ruta -> Ruta seguida hasta llegar al nodo actual
 %               Costo -> Costo total de la ruta correspondiente
@@ -207,7 +210,8 @@ rutaMasCorta([Primer|Ruta], Costo):-
 %                  rutas más cortas
 
 rutaMasCorta(Ruta, Costo):-
-	assert(rutaInversa(Ruta,Costo)).
+	inversa(Ruta,RutaCorta),
+	assert(rutaCorta(RutaCorta,Costo)).
 
 % Regla       : inversa
 

@@ -1,18 +1,18 @@
-% Hecho       : rutaInversa
+% Hecho       : rutaCorta
 % Descripción : Es un hecho dinámico usado para guardar las rutas con
 %                  menos costo entre los nodos del grafo
 
 :- dynamic
-	rutaInversa/2.
+	rutaCorta/2.
 
 % Regla       : verRutasCortas
-% Entradas    : RutaInversa -> Lista de la ruta con nodos del grafo
+% Entradas    : RutaCorta -> Lista de la ruta con nodos del grafo
 %               Costo -> Sumatoria de los costos de la ruta
-% Descripción : Tendrá éxito si la ruta inversa dada junto a su costo es
+% Descripción : Tendrá éxito si la ruta dada junto a su costo es
 %                  un hecho en la base de datos dinámica
 
-verRutasCortas(RutaInversa,Costo):-
-	rutaInversa(RutaInversa,Costo).
+verRutasCortas(RutaCorta,Costo):-
+	rutaCorta(RutaCorta,Costo).
 
 % Hecho       : ruta
 % Descripción : Representa todas las direcciones (arcos) disponibles
@@ -59,7 +59,8 @@ ruta(cachi, orosi, 12).
 
 viajar(Inicio, Final, Ruta, CostoSumado):-
 	recorrer(Inicio),
-	rutaInversa([Final|RutaInversa], Costo),
+	rutaCorta(RutaCorta, Costo),
+	inversa(RutaCorta,[Final|RutaInversa]),
 	inversa([Final|RutaInversa], Ruta),
 	CostoSumado is round(Costo).
 
@@ -73,7 +74,7 @@ viajar(Inicio, Final, _, _):-
 	write(Inicio),
 	write(' hasta '),
         write(Final),
-	write(' .\n').
+	write(' .\n'), !, fail.
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
@@ -155,7 +156,7 @@ recorrer(Inicio, Ruta, Costo):-
 %                  para encontrar las nuevas rutas más cortas
 
 recorrer(Inicio):-
-	retractall(rutaInversa(_, _)),
+	retractall(rutaCorta(_, _)),
 	recorrer(Inicio, [], 0).
 
 % Entradas    : Un elemento cualquiera (punto inicial por defecto)
@@ -196,10 +197,12 @@ miembro(Elemento, [_|Cola]):- miembro(Elemento, Cola).
 %		   guardada
 
 rutaMasCorta([Primer|Ruta], Costo):-
-	rutaInversa([Primer|_], CostoEncontrado), !,
+	rutaCorta(RutaCortaEncontrada, CostoEncontrado),
+	inversa(RutaCortaEncontrada, [Primer|_]), !,
 	Costo < CostoEncontrado,
-        retract(rutaInversa([Primer|_], _)),
-	assert(rutaInversa([Primer|Ruta], Costo)).
+        retract(rutaCorta(RutaCortaEncontrada, _)),
+	inversa([Primer|Ruta], NuevaRutaCorta),
+	assert(rutaCorta(NuevaRutaCorta, Costo)).
 
 % Entradas    : Ruta -> Ruta seguida hasta llegar al nodo actual
 %               Costo -> Costo total de la ruta correspondiente
@@ -207,7 +210,8 @@ rutaMasCorta([Primer|Ruta], Costo):-
 %                  rutas más cortas
 
 rutaMasCorta(Ruta, Costo):-
-	assert(rutaInversa(Ruta,Costo)).
+	inversa(Ruta,RutaCorta),
+	assert(rutaCorta(RutaCorta,Costo)).
 
 % Regla       : inversa
 
