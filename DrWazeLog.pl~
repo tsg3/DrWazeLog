@@ -18,35 +18,35 @@ verRutasCortas(RutaCorta,Costo):-
 % Descripción : Representa todas las direcciones (arcos) disponibles
 %                  entre los lugares del mapa y su respectivo costo.
 
-ruta(cartago, paraiso, 10).
-ruta(cartago, pacayas, 13).
-ruta(cartago, tres_rios, 8).
-ruta(cartago, san_jose, 20).
-ruta(cartago, musgo_verde, 10).
-ruta(pacayas, cervantes, 8).
-ruta(pacayas, cartago, 13).
-ruta(pacayas, tres_rios, 15).
-ruta(cervantes, juan_vinas, 5).
-ruta(cervantes, cachi, 7).
-ruta(cervantes, pacayas, 8).
-ruta(turrialba, pacayas, 18).
-ruta(juan_vinas, turrialba, 4).
-ruta(paraiso, cervantes, 4).
-ruta(paraiso, cachi, 10).
-ruta(paraiso, orosi, 8).
-ruta(san_jose, corralillo, 22).
-ruta(san_jose, cartago, 20).
-ruta(tres_rios, san_jose, 8).
-ruta(musgo_verde, cartago, 10).
-ruta(musgo_verde, corralillo, 6).
-ruta(corralillo, musgo_verde, 6).
-ruta(corralillo, san_jose, 22).
-ruta(orosi, paraiso, 8).
-ruta(orosi, cachi, 12).
-ruta(cachi, turrialba, 40).
-ruta(cachi, cervantes, 7).
-ruta(cachi, paraiso, 10).
-ruta(cachi, orosi, 12).
+ruta("cartago", "paraiso", 10).
+ruta("cartago", "pacayas", 13).
+ruta("cartago", "tres_rios", 8).
+ruta("cartago", "san_jose", 20).
+ruta("cartago", "musgo_verde", 10).
+ruta("pacayas", "cervantes", 8).
+ruta("pacayas", "cartago", 13).
+ruta("pacayas", "tres_rios", 15).
+ruta("cervantes", "juan_vinas", 5).
+ruta("cervantes", "cachi", 7).
+ruta("cervantes", "pacayas", 8).
+ruta("turrialba", "pacayas", 18).
+ruta("juan_vinas", "turrialba", 4).
+ruta("paraiso", "cervantes", 4).
+ruta("paraiso", "cachi", 10).
+ruta("paraiso", "orosi", 8).
+ruta("san_jose", "corralillo", 22).
+ruta("san_jose", "cartago", 20).
+ruta("tres_rios", "san_jose", 8).
+ruta("musgo_verde", "cartago", 10).
+ruta("musgo_verde", "corralillo", 6).
+ruta("corralillo", "musgo_verde", 6).
+ruta("corralillo", "san_jose", 22).
+ruta("orosi", "paraiso", 8).
+ruta("orosi", "cachi", 12).
+ruta("cachi", "turrialba", 40).
+ruta("cachi", "cervantes", 7).
+ruta("cachi", "paraiso", 10).
+ruta("cachi", "orosi", 12).
 
 % Regla       : viajar
 
@@ -58,7 +58,7 @@ ruta(cachi, orosi, 12).
 %		   inicial y el final
 
 viajar(Inicio, Final, Ruta, CostoSumado):-
-	recorrer(Inicio),
+	recorrer(Inicio), !,
 	rutaCorta(RutaCorta, Costo),
 	inversa(RutaCorta,[Final|RutaInversa]),
 	inversa([Final|RutaInversa], Ruta),
@@ -87,19 +87,31 @@ viajar(Inicio, Final, _, _):-
 %		   consola.
 
 viajar(Inicio, [], Final, Ruta, Costo):-
-	viajar(Inicio, Final, RutaEncontrada, CostoEncontrado),
-	inversa(Ruta, [_|RutaInversa]), inversa(RutaInversa, UltimoLugar),
-	concatenar(UltimoLugar, RutaEncontrada, RutaTotal),
+	viajar(Inicio, Final, [_|RutaEncontrada], CostoEncontrado),
+	concatenar(Ruta, RutaEncontrada, [Primero|RutaRestante]),
 	CostoSumado is round(CostoEncontrado + Costo),
 	write('La mejor ruta para ir desde '),
-	write(Inicio),
+	write(Primero),
 	write(' hasta '),
 	write(Final),
 	write(' es '),
-	escribirRuta(RutaTotal),
+	escribirRuta([Primero|RutaRestante]),
 	write(', con un costo de '),
 	write(CostoSumado),
 	write(' horas.\n').
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Siguiente -> Primer punto intermedio en el viaje
+%               Demas -> Resto de puntos intermedios en el viaje
+%               Final -> Punto de llegada en el mapa
+% Descripción : Inicio de la recursión para determinar la ruta
+%		   total. Tiene éxito si encuentra una ruta entre el
+%		   punto de inicio y el final pasando por todos los
+%		   puntos intermedios.
+
+viajar(Inicio, [Siguiente|Demas], Final, [], 0):-
+	viajar(Inicio, Siguiente, RutaEncontrada, CostoEncontrado),
+	viajar(Siguiente, Demas, Final, RutaEncontrada, round(CostoEncontrado)).
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Siguiente -> Primer punto intermedio en el viaje
@@ -113,9 +125,8 @@ viajar(Inicio, [], Final, Ruta, Costo):-
 %	           último punto intermedio y el punto de llegada.
 
 viajar(Inicio, [Siguiente|Demas], Final, Ruta, Costo):-
-	viajar(Inicio, Siguiente, RutaEncontrada, CostoEncontrado),
-	inversa(Ruta, [_|RutaInversa]), inversa(RutaInversa, UltimoLugar),
-	concatenar(UltimoLugar, RutaEncontrada, RutaTotal),
+	viajar(Inicio, Siguiente, [_|RutaEncontrada], CostoEncontrado),
+	concatenar(Ruta, RutaEncontrada, RutaTotal),
 	viajar(Siguiente, Demas, Final, RutaTotal, round(CostoEncontrado + Costo)).
 
 % Regla       : concatenar

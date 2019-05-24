@@ -87,19 +87,31 @@ viajar(Inicio, Final, _, _):-
 %		   consola.
 
 viajar(Inicio, [], Final, Ruta, Costo):-
-	viajar(Inicio, Final, RutaEncontrada, CostoEncontrado),
-	inversa(Ruta, [_|RutaInversa]), inversa(RutaInversa, UltimoLugar),
-	concatenar(UltimoLugar, RutaEncontrada, RutaTotal),
+	viajar(Inicio, Final, [_|RutaEncontrada], CostoEncontrado),
+	concatenar(Ruta, RutaEncontrada, [Primero|RutaRestante]),
 	CostoSumado is round(CostoEncontrado + Costo),
 	write('La mejor ruta para ir desde '),
-	write(Inicio),
+	write(Primero),
 	write(' hasta '),
 	write(Final),
 	write(' es '),
-	escribirRuta(RutaTotal),
+	escribirRuta([Primero|RutaRestante]),
 	write(', con un costo de '),
 	write(CostoSumado),
 	write(' horas.\n').
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Siguiente -> Primer punto intermedio en el viaje
+%               Demas -> Resto de puntos intermedios en el viaje
+%               Final -> Punto de llegada en el mapa
+% Descripción : Inicio de la recursión para determinar la ruta
+%		   total. Tiene éxito si encuentra una ruta entre el
+%		   punto de inicio y el final pasando por todos los
+%		   puntos intermedios.
+
+viajar(Inicio, [Siguiente|Demas], Final, [], 0):-
+	viajar(Inicio, Siguiente, RutaEncontrada, CostoEncontrado),
+	viajar(Siguiente, Demas, Final, RutaEncontrada, round(CostoEncontrado)).
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Siguiente -> Primer punto intermedio en el viaje
@@ -113,9 +125,8 @@ viajar(Inicio, [], Final, Ruta, Costo):-
 %	           último punto intermedio y el punto de llegada.
 
 viajar(Inicio, [Siguiente|Demas], Final, Ruta, Costo):-
-	viajar(Inicio, Siguiente, RutaEncontrada, CostoEncontrado),
-	inversa(Ruta, [_|RutaInversa]), inversa(RutaInversa, UltimoLugar),
-	concatenar(UltimoLugar, RutaEncontrada, RutaTotal),
+	viajar(Inicio, Siguiente, [_|RutaEncontrada], CostoEncontrado),
+	concatenar(Ruta, RutaEncontrada, RutaTotal),
 	viajar(Siguiente, Demas, Final, RutaTotal, round(CostoEncontrado + Costo)).
 
 % Regla       : concatenar
