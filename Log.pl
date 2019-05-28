@@ -12,6 +12,10 @@ lugar("turrialba").
 lugar("corralillo").
 lugar("orosi").
 lugar("cachi").
+lugar("belen").
+lugar("prusia").
+lugar("desamparados").
+lugar("coris").
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%       respuesta 1       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -204,6 +208,11 @@ lugar(["turrialba"|S], S).
 lugar(["corralillo"|S], S).
 lugar(["orosi"|S], S).
 lugar(["cachi"|S], S).
+lugar(["belen"|S], S).
+lugar(["prusia"|S], S).
+lugar(["desamparados"|S], S).
+lugar(["coris"|S], S).
+
 lugar([X|S],S).
 
 
@@ -232,7 +241,7 @@ consulta2:-write('Por favor indiqueme donde se encuentra: \n'),
 		   parse(E, F),
 		   valida2(F, H),
 		   valida_lugar(H, G),      % G es el lugar de partida
-		   
+
 		   valida_lugares_iguales(D, G).
 
 
@@ -244,7 +253,7 @@ consulta2:-write('Por favor indiqueme donde se encuentra: \n'),
 
 consulta3(X, Y, Z):-write('\nDe acuerdo, hay algun destino intermedio?:\n'),
 				 read(A),
-		 	     parse(A, B),
+			     parse(A, B),
 			     valida4(B, C),
 			     valida_si_no(C, X, Y, Z).
 
@@ -256,10 +265,10 @@ consulta3(X, Y, Z):-write('\nDe acuerdo, hay algun destino intermedio?:\n'),
 % Descripción : pregunta si hay o no destinos intermadios
 
 consulta4(X, Y, Z):-write('\nAlgun otro destino intermedio?:\n'),
-			     	read(A),
-		 	        parse(A, B),
+				read(A),
+			        parse(A, B),
 			        valida4(B, C),
-			        valida_si_no(C, X, Y, Z). 
+			        valida_si_no(C, X, Y, Z).
 
 
 % Regla       : consulta 5
@@ -269,8 +278,8 @@ consulta4(X, Y, Z):-write('\nAlgun otro destino intermedio?:\n'),
 % Descripción : pregunta cual es el destino intermedio y lo valida
 
 consulta5(X, Y, Z):-write('\nCual seria ese destino?:\n'),
-			     	read(A),
-		 	        parse(A, B),
+				read(A),
+			        parse(A, B),
 			        valida5(B, C),
 			        valida_lugar(C, D),      % D es un destino intermedio
 			        valida_lugares_iguales(X, Y, Z, D).
@@ -282,9 +291,11 @@ consulta5(X, Y, Z):-write('\nCual seria ese destino?:\n'),
 %               Z -> Lista de puntos intermadios
 % Descripción : calculo de la ruta y resumen en el log
 
-consulta6(X, Y, Z):-inversa(Z, [], L),
-					viajar(X, L, Y, [], 0, R, C),
-					respuestaWazeLog(X, Y, R, C).
+consulta6(X, Y, Z):- inversaAtom(Z, [], L),
+                     atom_string(NX, X),
+                     atom_string(NY, Y),
+                     viajar(NX, L, NY, [], 0, R, C),
+                     respuestaWazeLog(X, Y, R, C).
 
 
 
@@ -458,7 +469,7 @@ longitud([_|Resto],N):-longitud(Resto,N1), N is N1+1.
 %               Y -> respuesta de la lista invertida
 % Descripción : inverte una lista
 
-inversa([], B, C):-(C = B).
-inversa([X|A], B, C):- inversa(A, [X|B], C).
+inversaAtom([], B, C):-(C = B).
+inversaAtom([X|A], B, C):- atom_string(NX, X), inversaAtom(A, [NX|B], C).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%       final        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

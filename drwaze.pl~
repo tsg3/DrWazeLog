@@ -18,36 +18,36 @@ verRutasCortas(RutaCorta,Costo):-
 % Descripción : Representa todas las direcciones (arcos) disponibles
 %                  entre los lugares del mapa y su respectivo costo.
 
-ruta(cartago, paraiso, 10).
-ruta(cartago, pacayas, 13).
-ruta(cartago, belen, 8).
-ruta(cartago, desamparados, 20).
-ruta(cartago, prusia, 10).
-ruta(pacayas, cervantes, 8).
-ruta(pacayas, cartago, 13).
-ruta(pacayas, belen, 15).
-ruta(cervantes, coris, 5).
-ruta(cervantes, cachi, 7).
-ruta(cervantes, pacayas, 8).
-ruta(turrialba, pacayas, 18).
-ruta(coris, turrialba, 4).
-ruta(paraiso, cervantes, 4).
-ruta(paraiso, cachi, 10).
-ruta(paraiso, orosi, 8).
-ruta(desamparados, corralillo, 22).
-ruta(desamparados, cartago, 20).
-ruta(belen, desamparados, 8).
-ruta(belen, pacayas, 15).
-ruta(prusia, cartago, 10).
-ruta(prusia, corralillo, 6).
-ruta(corralillo, prusia, 6).
-ruta(corralillo, desamparados, 22).
-ruta(orosi, paraiso, 8).
-ruta(orosi, cachi, 12).
-ruta(cachi, turrialba, 40).
-ruta(cachi, cervantes, 7).
-ruta(cachi, paraiso, 10).
-ruta(cachi, orosi, 12).
+ruta("cartago", "paraiso", 10).
+ruta("cartago", "pacayas", 13).
+ruta("cartago", "belen", 8).
+ruta("cartago", "desamparados", 20).
+ruta("cartago", "prusia", 10).
+ruta("pacayas", "cervantes", 8).
+ruta("pacayas", "cartago", 13).
+ruta("pacayas", "belen", 15).
+ruta("cervantes", "coris", 5).
+ruta("cervantes", "cachi", 7).
+ruta("cervantes", "pacayas", 8).
+ruta("turrialba", "pacayas", 18).
+ruta("coris", "turrialba", 4).
+ruta("paraiso", "cervantes", 4).
+ruta("paraiso", "cachi", 10).
+ruta("paraiso", "orosi", 8).
+ruta("desamparados", "corralillo", 22).
+ruta("desamparados", "cartago", 20).
+ruta("belen", "desamparados", 8).
+ruta("belen", "pacayas", 15).
+ruta("prusia", "cartago", 10).
+ruta("prusia", "corralillo", 6).
+ruta("corralillo", "prusia", 6).
+ruta("corralillo", "desamparados", 22).
+ruta("orosi", "paraiso", 8).
+ruta("orosi", "cachi", 12).
+ruta("cachi", "turrialba", 40).
+ruta("cachi", "cervantes", 7).
+ruta("cachi", "paraiso", 10).
+ruta("cachi", "orosi", 12).
 
 % Regla       : viajar
 
