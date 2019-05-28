@@ -49,7 +49,6 @@ sintagma_verbal1(S0,S):- aux2(S0,S1),
 %                 de a donde se dirige
 
 oracion2(S0,S):- sintagma_verbal2(S0,S1), lugar(S1,S).
-oracion2(S0,S):- aux3(S0,S1), lugar(S1,S).
 oracion2(S0,S):- lugar(S0,S).
 
 sintagma_verbal2(S0,S):- verbo2(S0,S1),
@@ -98,13 +97,13 @@ sintagma_verbal4(S0,S):- verbo6(S0,S1),
 						 verbo5(S1,S2),
 						 aux5(S2, S).
 
-sintagma_verbal4(S0,S):- verbo6(con_que,S0,S1),
+sintagma_verbal4(S0,S):- verbo6(que,S0,S1),
 						 aux6(S1, S2),
 						 verbo5(S2,S3),
 						 aux5(S3, S).
 
 sintagma_verbal4(S0,S):- aux2(S0, S1),
-						 verbo6(con_me,S1,S2),
+						 verbo6(me,S1,S2),
 						 verbo5(S2,S3),
 						 aux5(S3, S).
 
@@ -174,9 +173,9 @@ verbo5(["pasar"|S],S).
 verbo5(["ir"|S],S).
 verbo5(["dirigirme"|S],S).
 
+verbo6(que, ["tengo"|S],S).
 verbo6(["necesito"|S],S).
-verbo6(con_que, ["tengo"|S],S).
-verbo6(con_me, ["urge"|S],S).
+verbo6(me ["urge"|S],S).
 
 verbo7(["hay"|S],S).
 
@@ -282,8 +281,7 @@ consulta5(X, Y, Z):-write('\nCual seria ese destino?:\n'),
 %               Z -> Lista de puntos intermadios
 % Descripción : calculo de la ruta y resumen en el log
 
-consulta6(X, Y, Z):-inversa(Z, [], L),
-					viajar(X, L, Y, [], 0, R, C),
+consulta6(X, Y, Z):-viajar(X, Z, Y, [], 0, R, C),
 					respuestaWazeLog(X, Y, R, C).
 
 
@@ -299,7 +297,7 @@ consulta6(X, Y, Z):-inversa(Z, [], L),
 %               y sino da un mesaje de error y prenguta recursivamente hasta que de una respuesta valida
 
 valida1(A, B):- (oracion1(A, []) -> B = A).
-valida1(_, B):-write('\nNo le entiendo. Por favor se mas especifico. Indiqueme donde se encuentras: \n'),
+valida1(A, B):-write('\nNo le entiendo. Por favor se mas especifico. Indiqueme donde se encuentras: \n'),
 	           read(C),
 	           parse(C, D),
 	           valida1(D, B).
@@ -312,7 +310,7 @@ valida1(_, B):-write('\nNo le entiendo. Por favor se mas especifico. Indiqueme d
 %               y sino da un mesaje de error y prenguta recursivamente hasta que de una respuesta valida
 
 valida2(A, B):- (oracion2(A, []) -> B = A).
-valida2(_, B):-write('\nNo le entiendo. Por favor se mas especifico. Intentelo de nuevo, a donde se dirige?: \n'),
+valida2(A, B):-write('\nNo le entiendo. Por favor se mas especifico. Intentelo de nuevo, a donde se dirige?: \n'),
 	           read(C),
 	           parse(C, D),
 	           valida2(D, B).
@@ -324,8 +322,8 @@ valida2(_, B):-write('\nNo le entiendo. Por favor se mas especifico. Intentelo d
 % Descripción : valida si la oracion ingresada por el usuario es correcta segun la base de datos
 %               y sino da un mesaje de error y prenguta recursivamente hasta que de una respuesta valida
 
-valida3(A, B, _):- (oracion3(A, []) -> B = A).
-valida3(_, B, X):-write('\nNo le entiendo. Intentelo de nuevo, a donde se encuentra '),
+valida3(A, B, X):- (oracion3(A, []) -> B = A).
+valida3(A, B, X):-write('\nNo le entiendo. Intentelo de nuevo, a donde se encuentra '),
 				  write(X),
 				  write(': \n'),
 	              read(C),
@@ -340,7 +338,7 @@ valida3(_, B, X):-write('\nNo le entiendo. Intentelo de nuevo, a donde se encuen
 %               y sino da un mesaje de error y prenguta recursivamente hasta que de una respuesta valida
 
 valida4(A, B):- (oracion5(A, []) -> B = A).
-valida4(_, B):-write('\nNo le entiendo. Hay algun otro destino intermedio? debe responer si o no: \n'),
+valida4(A, B):-write('\nNo le entiendo. Hay algun otro destino intermedio? debe responer si o no: \n'),
 	           read(C),
 	           parse(C, D),
 	           valida4(D, B).
@@ -353,7 +351,7 @@ valida4(_, B):-write('\nNo le entiendo. Hay algun otro destino intermedio? debe 
 %               y sino da un mesaje de error y prenguta recursivamente hasta que de una respuesta valida
 
 valida5(A, B):-(oracion4(A, []) -> B = A).
-valida5(_, B):-write('\nNo le entiendo. Cual es el destino intermedio?: \n'),
+valida5(A, B):-write('\nNo le entiendo. Cual es el destino intermedio?: \n'),
 	           read(C),
 	           parse(C, D),
 	           valida5(D, B).
@@ -366,11 +364,11 @@ valida5(_, B):-write('\nNo le entiendo. Cual es el destino intermedio?: \n'),
 %               no se entra en la base de datos pregunta recursivamente donde se encuentra ese lugar
 %               hasta que se de una respuesta valida
 
-valida_lugar([X|_], B):- (lugar(X) -> B = X).
+valida_lugar([X|A], B):- (lugar(X) -> B = X).
 valida_lugar([X|A], B):- valida_lugar(A, B, X).
 
-valida_lugar([X|_], B, _):- (lugar(X) -> B = X).
-valida_lugar([X|A], B, _):- valida_lugar(A, B, X).
+valida_lugar([X|A], B, C):- (lugar(X) -> B = X).
+valida_lugar([X|A], B, C):- valida_lugar(A, B, X).
 
 valida_lugar([], B, X):-write('\nDebe ingresar un lugar valido, donde se encuentra '),
 						write(X),
@@ -391,9 +389,9 @@ valida_lugar([], B, X):-write('\nDebe ingresar un lugar valido, donde se encuent
 valida_lugares_iguales(A, A):-vuelve_a_empezar(1).
 valida_lugares_iguales(A, B):-consulta3(A, B, []).
 
-valida_lugares_iguales(X, _, _, X):-vuelve_a_empezar(2).
-valida_lugares_iguales(_, Y, _, Y):-vuelve_a_empezar(2).
-valida_lugares_iguales(_, _, Z, A):-(es_miembro(Z, A) -> vuelve_a_empezar(2)).
+valida_lugares_iguales(X, Y, Z, X):-vuelve_a_empezar(2).
+valida_lugares_iguales(X, Y, Z, Y):-vuelve_a_empezar(2).
+valida_lugares_iguales(X, Y, Z, A):-(es_miembro(Z, A) -> vuelve_a_empezar(2)).
 valida_lugares_iguales(X, Y, Z, A):-(longitud(Z, 0) -> consulta4(X, Y, [A])).
 valida_lugares_iguales(X, Y, Z, A):-consulta4(X, Y, [A|Z]).
 
@@ -407,9 +405,9 @@ valida_lugares_iguales(X, Y, Z, A):-consulta4(X, Y, [A|Z]).
 %               si hay mas destinos entonces repite el proceso de pregunar por ese lugar y validarlo
 %               si no se dirige a dar un resumen de los lugares y calcular la ruta
 
-valida_si_no(["si"|_], X, Y, Z):-consulta5(X, Y, Z).
-valida_si_no(["no"|_], X, Y, Z):-consulta6(X, Y, Z).
-valida_si_no(["ninguno"|_], X, Y, Z):-consulta6(X, Y, Z).
+valida_si_no(["si"|A], X, Y, Z):-consulta5(X, Y, Z).
+valida_si_no(["no"|A], X, Y, Z):-consulta6(X, Y, Z).
+valida_si_no(["ninguno"|A], X, Y, Z):-consulta6(X, Y, Z).
 
 
 
@@ -439,8 +437,8 @@ parse(X, Y):- split_string(X, " ", ".,\s\t\n", Y).
 %               Y -> miembro a consultar
 % Descripción : consulta si un elemento es miembro de una lista
 
-es_miembro([X|_], X).
-es_miembro([_|A], B):- es_miembro(A, B).
+es_miembro([X|A], X).
+es_miembro([X|A], B):- es_miembro(A, B).
 
 
 % Regla       : longitud
