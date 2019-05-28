@@ -213,7 +213,7 @@ lugar(["prusia"|S], S).
 lugar(["desamparados"|S], S).
 lugar(["coris"|S], S).
 
-lugar([X|S],S).
+lugar([_|S],S).
 
 
 

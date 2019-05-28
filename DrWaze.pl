@@ -1,4 +1,6 @@
-% Hecho       : rutaCorta
+% Hecho       : rutaCorta(Ruta, Costo)
+% Entradas    : Ruta -> Lista de nodos del grafo
+%               Costo -> Costo de la ruta dada
 % Descripción : Es un hecho dinámico usado para guardar las rutas con
 %                  menos costo entre los nodos del grafo
 
@@ -14,7 +16,10 @@
 verRutasCortas(RutaCorta,Costo):-
 	rutaCorta(RutaCorta,Costo).
 
-% Hecho       : ruta
+% Hecho       : ruta(PuntoDePartida, Destino, Costo)
+% Entradas    : PuntoDePartida -> Punto inicial de la ruta
+%               Destino -> Punto final de la ruta
+%               Costo -> Costo de la ruta dada
 % Descripción : Representa todas las direcciones (arcos) disponibles
 %                  entre los lugares del mapa y su respectivo costo.
 
@@ -50,7 +55,6 @@ ruta(cachi, paraiso, 10).
 ruta(cachi, orosi, 12).
 
 % Regla       : viajar
-
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
 %               Ruta -> Ruta recorrida desde el inicio al final
@@ -64,12 +68,7 @@ viajar(Inicio, Final, Ruta, CostoSumado):-
 	inversa(Ruta,[Final|_]),
 	CostoSumado is round(Costo).
 
-% Entradas    : Cuatro argumentos cualquiera
-% Descripción : Tendrá éxito siempre, y se ejecuta cuando no se
-%                  encuentra una ruta entre dos puntos del mapa.
-
-viajar(_, _, _, _):- !, fail.
-
+% Regla       : viajar
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
 %               RutaTotal -> Ruta recorrida con anterioridad
@@ -82,6 +81,7 @@ viajar(Inicio, [], Final, [], 0, RutaTotal, CostoTotal):-
 	!, viajar(Inicio, Final, RutaTotal, CostoEncontrado),
 	CostoTotal is round(CostoEncontrado).
 
+% Regla       : viajar
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
 %               RutaEncontrada -> Ultima ruta recorrida
@@ -95,6 +95,7 @@ viajar(Inicio, [], Final, [], 0, RutaTotal, CostoTotal):-
 viajar(Inicio, [], Final, _, _, RutaEncontrada, CostoEncontrado):-
 	!, viajar(Inicio, Final, [_|RutaEncontrada], CostoEncontrado), !.
 
+% Regla       : viajar
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Siguiente -> Primer punto intermedio en el viaje
 %               Demas -> Resto de puntos intermedios en el viaje
@@ -112,6 +113,7 @@ viajar(Inicio, [Siguiente|Demas], Final, [], 0, RutaTotal, CostoTotal):-
 	viajar(Siguiente, Demas, Final, RutaEncontrada, round(CostoEncontrado), SiguienteRuta, CostoSiguiente),
 	CostoTotal is round(CostoEncontrado + CostoSiguiente).
 
+% Regla       : viajar
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Siguiente -> Primer punto intermedio en el viaje
 %               Demas -> Resto de puntos intermedios en el viaje
@@ -133,7 +135,6 @@ viajar(Inicio, [Siguiente|Demas], Final, Ruta, Costo, RutaFutura, CostoFuturo):-
 	CostoFuturo is round(CostoEncontrado + CostoSiguiente).
 
 % Regla       : respuestaWazeLog
-
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
 % Descripción : Imprime en consola que no se encontró una ruta entre los
@@ -146,6 +147,7 @@ respuestaWazeLog(Inicio, Final, 0, 0):-
         write(Final),
 	write(' .\n').
 
+% Regla       : respuestaWazeLog
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
 %               Ruta -> Ruta recorrida con anterioridad
@@ -166,13 +168,13 @@ respuestaWazeLog(Inicio, Final, Ruta, Costo):-
 	write(' horas.\n').
 
 % Regla       : concatenar
-
 % Entradas    : Lista -> lista de elementos
 % Descripción : Tendrá éxito si la primer lista es vacía y las otras dos
 %                  listas son iguales
 
 concatenar([],Lista,Lista).
 
+% Regla       : concatenar
 % Entradas    : Elemento -> Primer elemento de las listas 1 y 3
 %		Resto1, Resto3 -> Colas de las listas 1 y 3
 %		Lista2 -> Lista de elementos
@@ -183,7 +185,6 @@ concatenar([],Lista,Lista).
 concatenar([Elemento|Resto1],Lista2,[Elemento|Resto3]):- concatenar(Resto1,Lista2,Resto3).
 
 % Regla       : recorrer
-
 % Entradas    : Inicio -> Punto actual en el mapa
 %               Ruta -> Camino seguido hasta el punto actual en el mapa
 %               Costo -> Costo de la ruta actual analizada
@@ -198,6 +199,7 @@ recorrer(Inicio, Ruta, Costo):-
 	rutaMasCorta([RutaEncontrada, Inicio|Ruta], Costo + CostoEncontrada),
 	recorrer(RutaEncontrada, [Inicio|Ruta], Costo + CostoEncontrada).
 
+% Regla       : recorrer
 % Entradas    : Inicio -> Punto de inicio en el mapa
 % Descripción : Limpia la base de datos e inicia el recorrido del mapa
 %                  para encontrar las nuevas rutas más cortas
@@ -206,6 +208,7 @@ recorrer(Inicio):-
 	retractall(rutaCorta(_, _)),
 	recorrer(Inicio, [], 0).
 
+% Regla       : recorrer
 % Entradas    : Un elemento cualquiera (punto inicial por defecto)
 % Descripción : Punto de parada para el recorrido y el backtracking del
 %                  mapa en busca de las rutas más cortas
@@ -213,16 +216,15 @@ recorrer(Inicio):-
 recorrer(_).
 
 % Regla       : miembro
-
 % Entradas    : Inicio -> Elemento cualquiera que representa el primer
 %	           argumento y la cabeza de la lista en el segundo
 %	           argumento.
 % Descripción : Tendrá éxito si la cabeza de la
 %	           lista y el elemento solicitado son iguales
 
-
 miembro(Elemento, [Elemento|_]).
 
+% Regla       : miembro
 % Entradas    : Elemento -> Elemento a encontrar en la lista
 %		Cola -> Cola de la lista en la que se quiere buscar el
 %		   elemento
@@ -233,7 +235,6 @@ miembro(Elemento, [Elemento|_]).
 miembro(Elemento, [_|Cola]):- miembro(Elemento, Cola).
 
 % Regla       : rutaMasCorta
-
 % Entradas    : Primera -> Nodo del grafo al que va a buscar una ruta más
 %		   corta de la existente
 %		Ruta -> Camino seguido hasta el nodo actual que se está
@@ -251,6 +252,7 @@ rutaMasCorta([Primer|Ruta], Costo):-
 	inversa([Primer|Ruta], NuevaRutaCorta),
 	assert(rutaCorta(NuevaRutaCorta, Costo)).
 
+% Regla       : rutaMasCorta
 % Entradas    : Ruta -> Ruta seguida hasta llegar al nodo actual
 %               Costo -> Costo total de la ruta correspondiente
 % Descripción : Añade la actual ruta a la base de datos dinámicas de las
@@ -261,7 +263,6 @@ rutaMasCorta(Ruta, Costo):-
 	assert(rutaCorta(RutaCorta,Costo)).
 
 % Regla       : inversa
-
 % Entradas    : Lista1, Lista2 -> Listas que son inversas la una con la
 %                  otra
 % Descripción : Inicia el análisis para verificar si las listas son
@@ -269,6 +270,7 @@ rutaMasCorta(Ruta, Costo):-
 
 inversa(Lista1, Lista2):- inversa(Lista1, [], Lista2).
 
+% Regla       : inversa
 % Entradas    : Lista -> Lista de elementos
 % Descripción : Condición de parada para la regla 'inversa'. Tendrá
 %		   éxito cuando la lista en el segundo y tercer
@@ -276,6 +278,7 @@ inversa(Lista1, Lista2):- inversa(Lista1, [], Lista2).
 
 inversa([], Lista, Lista).
 
+% Regla       : inversa
 % Entradas    : Primer1 -> Cabeza de la primer lista
 %               Cola1 -> Cola de la primer lista
 %               Lista2 -> Segunda lista
@@ -297,13 +300,13 @@ escribirRuta([Primer|Ruta]):-
 	escribirRutaAux(Ruta).
 
 % Regla       : escribirRutaAux
-
 % Entradas    : Su argumento debe ser una lista vacía
 % Descripción : Finaliza la impresión de una ruta. Condición de parada
 %                  para 'escribirRuta'
 
 escribirRutaAux([]):- write('').
 
+% Regla       : escribirRutaAux
 % Entradas    : Siguiente -> Nodo siguiente al último nodo impreso en
 %                  consola
 %		Ruta -> Resto de la ruta que hace falta imprimir

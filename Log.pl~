@@ -470,6 +470,6 @@ longitud([_|Resto],N):-longitud(Resto,N1), N is N1+1.
 % Descripción : inverte una lista
 
 inversaAtom([], B, C):-(C = B).
-inversaAtom([X|A], B, C):- atom_string(NX, X), inversa(A, [NX|B], C).
+inversaAtom([X|A], B, C):- atom_string(NX, X), inversaAtom(A, [NX|B], C).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%       final        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
