@@ -135,6 +135,18 @@ viajar(Inicio, [Siguiente|Demas], Final, Ruta, Costo, RutaFutura, CostoFuturo):-
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
+% Descripción : Imprime en consola que no se encontró una ruta entre los
+%                  nodos inicial y final
+
+respuestaWazeLog(Inicio, Final, 0, 0):-
+	write('No hay rutas para ir desde '),
+	write(Inicio),
+	write(' hasta '),
+        write(Final),
+	write(' .\n').
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Final -> Punto de llegada en el mapa
 %               Ruta -> Ruta recorrida con anterioridad
 %               Costo -> Costo de la ruta recorrida
 % Descripción : Imprime en consola la ruta requerida para realizar el
@@ -151,18 +163,6 @@ respuestaWazeLog(Inicio, Final, Ruta, Costo):-
 	write(', con un costo de '),
 	write(Costo),
 	write(' horas.\n').
-
-% Entradas    : Inicio -> Punto de inicio en el mapa
-%               Final -> Punto de llegada en el mapa
-% Descripción : Imprime en consola que no se encontró una ruta entre los
-%                  nodos inicial y final
-
-respuestaWazeLog(Inicio, Final, _, _):-
-	write('No hay rutas para ir desde '),
-	write(Inicio),
-	write(' hasta '),
-        write(Final),
-	write(' .\n').
 
 % Regla       : concatenar
 
