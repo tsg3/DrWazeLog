@@ -63,67 +63,53 @@ viajar(Inicio, Final, Ruta, CostoSumado):-
 	inversa(Ruta,[Final|_]),
 	CostoSumado is round(Costo).
 
-% Entradas    : Inicio -> Punto de inicio en el mapa
-%               Final -> Punto de llegada en el mapa
-% Descripción : Tendrá éxito si no encuentra alguna ruta entre el punto
-%		   inicial y el final e imprime el error en la consola
+% Entradas    : Cuatro argumentos cualquiera
+% Descripción : Tendrá éxito siempre, y se ejecuta cuando no se
+%                  encuentra una ruta entre dos puntos del mapa.
 
-viajar(Inicio, Final, _, _):-
-	write('No hay rutas para ir desde '),
-	write(Inicio),
-	write(' hasta '),
-        write(Final),
-	write(' .\n'), !, fail.
+viajar(_, _, _, _):- !, fail.
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Final -> Punto de llegada en el mapa
-%               Ruta -> Ruta recorrida con anterioridad
-%               Costo -> Costo de la ruta recorrida
+%               RutaTotal -> Ruta recorrida con anterioridad
+%               CostoTotal -> Costo de la ruta recorrida
+% Descripción : Tendrá éxito si existe una ruta entre el nodo inicial y
+%	           el nodo final, pero solo si no se solicitan nodos
+%	           intermedios.
+
+viajar(Inicio, [], Final, [], 0, RutaTotal, CostoTotal):-
+	!, viajar(Inicio, Final, RutaTotal, CostoEncontrado),
+	CostoTotal is round(CostoEncontrado).
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Final -> Punto de llegada en el mapa
+%               RutaEncontrada -> Ultima ruta recorrida
+%               CostoEncontrado -> Costo de la ultima ruta recorrida
 % Descripción : Condición de parada para viajar. Analiza la última ruta
 %		   para completar la ruta total más corta posible entre
 %		   los puntos inicio y final definidos al inicio de la
 %		   recursión. Si existe una ruta, la imprime en la
 %		   consola.
-%
-viajar(Inicio, [], Final, [], Costo):-
-	!, viajar(Inicio, Final, RutaEncontrada, CostoEncontrado),
-	CostoSumado is round(CostoEncontrado + Costo),
-	write('La mejor ruta para ir desde '),
-	write(Inicio),
-	write(' hasta '),
-	write(Final),
-	write(' es '),
-	escribirRuta(RutaEncontrada),
-	write(', con un costo de '),
-	write(CostoSumado),
-	write(' horas.\n').
 
-viajar(Inicio, [], Final, Ruta, Costo):-
-	!, viajar(Inicio, Final, [_|RutaEncontrada], CostoEncontrado), !,
-	concatenar(Ruta, RutaEncontrada, [Primero|RutaRestante]),
-	CostoSumado is round(CostoEncontrado + Costo),
-	write('La mejor ruta para ir desde '),
-	write(Primero),
-	write(' hasta '),
-	write(Final),
-	write(' es '),
-	escribirRuta([Primero|RutaRestante]),
-	write(', con un costo de '),
-	write(CostoSumado),
-	write(' horas.\n').
+viajar(Inicio, [], Final, _, _, RutaEncontrada, CostoEncontrado):-
+	!, viajar(Inicio, Final, [_|RutaEncontrada], CostoEncontrado), !.
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Siguiente -> Primer punto intermedio en el viaje
 %               Demas -> Resto de puntos intermedios en el viaje
 %               Final -> Punto de llegada en el mapa
+%               RutaTotal -> Camino que falta por recorrer
+%               CostoTotal -> Costo de las futuras rutas
 % Descripción : Inicio de la recursión para determinar la ruta
 %		   total. Tiene éxito si encuentra una ruta entre el
 %		   punto de inicio y el final pasando por todos los
 %		   puntos intermedios.
 
-viajar(Inicio, [Siguiente|Demas], Final, [], 0):-
+viajar(Inicio, [Siguiente|Demas], Final, [], 0, RutaTotal, CostoTotal):-
 	!, viajar(Inicio, Siguiente, RutaEncontrada, CostoEncontrado), !,
-	viajar(Siguiente, Demas, Final, RutaEncontrada, round(CostoEncontrado)).
+	concatenar(RutaEncontrada, SiguienteRuta, RutaTotal),
+	viajar(Siguiente, Demas, Final, RutaEncontrada, round(CostoEncontrado), SiguienteRuta, CostoSiguiente),
+	CostoTotal is round(CostoEncontrado + CostoSiguiente).
 
 % Entradas    : Inicio -> Punto de inicio en el mapa
 %               Siguiente -> Primer punto intermedio en el viaje
@@ -131,15 +117,52 @@ viajar(Inicio, [Siguiente|Demas], Final, [], 0):-
 %               Final -> Punto de llegada en el mapa
 %               Ruta -> Ruta recorrida con anterioridad
 %               Costo -> Costo de la ruta recorrida
+%               RutaFutura -> Camino que falta por recorrer
+%               CostoFuturo -> Costo de las futuras rutas
 % Descripción : Tendrá éxito si encuentra rutas entre el punto de inicio
 %	           y el primer punto intermedio, y este con el siguiente
 %	           punto intermedio, etc; y si existe una ruta entre el
 %	           último punto intermedio y el punto de llegada.
 
-viajar(Inicio, [Siguiente|Demas], Final, Ruta, Costo):-
+viajar(Inicio, [Siguiente|Demas], Final, Ruta, Costo, RutaFutura, CostoFuturo):-
 	!, viajar(Inicio, Siguiente, [_|RutaEncontrada], CostoEncontrado), !,
 	concatenar(Ruta, RutaEncontrada, RutaTotal),
-	viajar(Siguiente, Demas, Final, RutaTotal, round(CostoEncontrado + Costo)).
+	concatenar(RutaEncontrada, RutaSiguiente, RutaFutura),
+	viajar(Siguiente, Demas, Final, RutaTotal, round(CostoEncontrado + Costo), RutaSiguiente, CostoSiguiente),
+	CostoFuturo is round(CostoEncontrado + CostoSiguiente).
+
+% Regla       : respuestaWazeLog
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Final -> Punto de llegada en el mapa
+%               Ruta -> Ruta recorrida con anterioridad
+%               Costo -> Costo de la ruta recorrida
+% Descripción : Imprime en consola la ruta requerida para realizar el
+%                  recorrido deseado por el cliente, además de su costo
+%		   correspondiente.
+
+respuestaWazeLog(Inicio, Final, Ruta, Costo):-
+	write('La mejor ruta para ir desde '),
+	write(Inicio),
+	write(' hasta '),
+	write(Final),
+	write(' es '),
+	escribirRuta(Ruta),
+	write(', con un costo de '),
+	write(Costo),
+	write(' horas.\n').
+
+% Entradas    : Inicio -> Punto de inicio en el mapa
+%               Final -> Punto de llegada en el mapa
+% Descripción : Imprime en consola que no se encontró una ruta entre los
+%                  nodos inicial y final
+
+respuestaWazeLog(Inicio, Final, _, _):-
+	write('No hay rutas para ir desde '),
+	write(Inicio),
+	write(' hasta '),
+        write(Final),
+	write(' .\n').
 
 % Regla       : concatenar
 
