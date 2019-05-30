@@ -18,8 +18,6 @@ verRutasCortas(RutaCorta,Costo):-
 % Descripci�n : Representa todas las direcciones (arcos) disponibles
 %                  entre los lugares del mapa y su respectivo costo.
 
-ruta(logramos, cartago, 23).
-ruta(si , logramos, 1111).
 ruta(cartago, paraiso, 10).
 ruta(cartago, pacayas, 13).
 ruta(cartago, belen, 8).

@@ -3,6 +3,12 @@ package com.tec.WazeLog.GUI;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 
+/**
+ * Interfaz para crear implementar el
+ * factory con cada uno de los componentes
+ * mostrados en pantalla
+ */
+
 public interface WLComponent {
 
     public void draw(Pane layout);

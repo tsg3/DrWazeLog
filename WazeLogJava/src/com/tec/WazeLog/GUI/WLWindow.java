@@ -27,7 +27,11 @@ public class WLWindow{
     public WLComponentFactory factory;
 
 
-
+    /**Constructor
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana
+     * @param titulo Titulo de la ventana
+     */
     public WLWindow(java.lang.Integer width, java.lang.Integer height, java.lang.String titulo) {
         this.stage = new WLStage(titulo);
         this.layout = new WLLayout();
@@ -57,30 +61,11 @@ public class WLWindow{
     }
 
 
-/*
-
-    @Override
-    public void start(Stage stage) throws Exception {
-
-        createLines();
-        createbuttons();
-        createPesos();
-
-        for (WLLine l : this.lines){
-            this.layout.getLayout().getChildren().add(l.getLine());
-        }
-        for (WLButton b : this.buttons){
-            this.layout.getLayout().getChildren().add(b.getWlButton());
-        }
-        for (WLLabel n : this.pesos){
-            this.layout.getLayout().getChildren().add(n.getLabel());
-        }
-
-        this.stage.getStage().show();
-
-
-    }
-*/
+    /** Añade una ruta a el Grafo interno
+     * @param nodoInicio Nnombre del nodo inicial
+     * @param nodoFinal Nombre del nodo final
+     * @param peso Peso entre ambos nodos
+     */
     public void addRoute (java.lang.String nodoInicio, java.lang.String nodoFinal, java.lang.Integer peso){
 
 
@@ -92,12 +77,14 @@ public class WLWindow{
 
     }
 
+    /**
+     * Crea los botones y los añade a lista
+     */
     public void createbuttons(){
 
         java.lang.Integer i = 10;
         java.lang.Integer j = 10;
 
-        java.lang.Integer sumai = 400;
         java.lang.Integer sumaj = 200;
 
         java.lang.Integer even = 0;
@@ -130,7 +117,7 @@ public class WLWindow{
 
                 if (j >= 800){
                     j = 10;
-                    i = 610;
+                    i += 600;
                     sumaj = 250;
                 }
             }
@@ -139,6 +126,9 @@ public class WLWindow{
 
     }
 
+    /**
+     * Crea las lineas y los añade a lista
+     */
     public void createLines(){
         for(Arista a : this.grafo.getAristas()){
 
@@ -167,6 +157,9 @@ public class WLWindow{
         }
     }
 
+    /**
+     * Crea los labels y los añade a lista
+     */
     public void createPesos(){
         for (WLComponent l : this.lines){
 
@@ -176,6 +169,10 @@ public class WLWindow{
         }
 
     }
+
+    /**
+     * Getters y setters
+     */
 
     public WLComponent getRestartButton() {
         return restartButton;

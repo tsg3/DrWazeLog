@@ -8,6 +8,11 @@ public class WLLabel implements WLComponent{
 
     public Label label;
 
+    /**Constructor
+     * @param label  Peso de la linea a la que se le atribuye este label
+     * @param posX Posicion en X del label
+     * @param posY Posicion en Y del label
+     */
     public WLLabel (java.lang.Integer label, java.lang.Integer posX, java.lang.Integer posY){
 
         this.label = new Label(label.toString());
@@ -16,6 +21,10 @@ public class WLLabel implements WLComponent{
 
 
     }
+
+    /**
+     * Getters y Setters
+     */
 
     public Label getLabel() {
         return label;

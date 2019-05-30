@@ -18,8 +18,12 @@ public class WLButton implements  WLComponent{
     public java.lang.Boolean primero;
 
 
-
-
+    /** Boton circular constructor
+     * @param lugar Nombre de botón en pantalla
+     * @param posX posicion en X donde estaba ubicado el boton
+     * @param posY posicion en Y donde estaba ubicado el boton
+     * @param radio Tamaño del radio en pixeles del boton circular
+     */
     public WLButton(java.lang.String lugar, java.lang.Integer posX, java.lang.Integer posY,
                     java.lang.Integer radio){
 
@@ -43,6 +47,12 @@ public class WLButton implements  WLComponent{
 
         );
     }
+
+    /** Boton rectangular constructor
+     * @param nombre nombre del boton en pantalla
+     * @param posX posicion en X donde estaba ubicado el boton
+     * @param posY posicion en Y donde estaba ubicado el boton
+     */
     public WLButton(java.lang.String nombre, java.lang.Integer posX, java.lang.Integer posY){
 
         this.lugar = nombre;
@@ -57,6 +67,10 @@ public class WLButton implements  WLComponent{
         wlButton.setLayoutX(posX);
         wlButton.setLayoutY(posY);
     }
+
+    /**
+     * Getters y Setters
+     */
 
     public Button getWlButton() {
         return wlButton;

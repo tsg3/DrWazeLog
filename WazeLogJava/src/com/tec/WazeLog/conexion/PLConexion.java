@@ -80,8 +80,8 @@ public class PLConexion {
     }
 
     /**
-     * @param consult Arrchivo al que se va a consultar "consult('archivo')"
-     * @param hecho  
+     * @param consult Archivo al que se va a consultar "consult('archivo')"
+     * @param hecho  hecho de la base de datos donde se agarran sus variables
      * @return
      */
     public java.lang.Integer getLength(java.lang.String consult, java.lang.String hecho) {
@@ -100,6 +100,13 @@ public class PLConexion {
     }
 
 
+    /**
+     * @param ruta Ruta del archivo al que se va a escribir
+     * @param pInicial Direccion inicial seleccionada
+     * @param pFinal Direccion final seleccionada
+     * @param peso Peso de la nueva conexion
+     * @throws IOException Excepcion si no se encuentra ruta
+     */
     public void addRuta(java.lang.String ruta, java.lang.String pInicial, java.lang.String pFinal, java.lang.Integer peso)
             throws IOException {
 

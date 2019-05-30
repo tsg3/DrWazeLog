@@ -21,6 +21,13 @@ public class WLLine implements  WLComponent{
     private java.lang.Integer posY2;
     public Line line;
 
+    /**Constructor
+     * @param peso Peso de la linea
+     * @param posX1 Primera posicion en X
+     * @param posY1 Primera posicion en Y
+     * @param posX2 Segunda posicion en X
+     * @param posY2 Segunda posicion en Y
+     */
     public WLLine(java.lang.Integer peso, java.lang.Integer posX1, java.lang.Integer posY1,
                   java.lang.Integer posX2, java.lang.Integer posY2) {
 
@@ -52,6 +59,10 @@ public class WLLine implements  WLComponent{
                     "igual a 0 al peso" );
         }
     }
+
+    /**
+     * Setters y Getters
+     */
 
     @Override
     public java.lang.Integer getPeso() {
