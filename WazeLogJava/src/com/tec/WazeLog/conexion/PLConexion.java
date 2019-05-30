@@ -119,7 +119,7 @@ public class PLConexion {
         while ((st = br.readLine()) != null) {
 
             if (st.startsWith("ruta(")) {
-                list.add("ruta(" + pInicial + ", " + pFinal + ", " + peso + ").");
+                list.add("ruta(" + pInicial.toLowerCase() + ", " + pFinal.toLowerCase() + ", " + peso + ").");
                 list.add(st);
 
                 break;
