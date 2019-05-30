@@ -35,6 +35,7 @@ head1(S0,S):- saludo(S0,S).
 
 body1(head,S0,S):- sintagma_verbal1(S0,S1), lugar(S1,S).
 body1(S0,S):- sintagma_verbal1(S0,S1), lugar(S1,S).
+body1(S0,S):- aux(S0,S1), lugar(S1,S).
 body1(S0,S):- lugar(S0,S).
 
 sintagma_verbal1(S0,S):- verbo1(S0,S1),
