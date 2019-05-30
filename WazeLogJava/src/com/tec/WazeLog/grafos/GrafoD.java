@@ -67,70 +67,10 @@ public class GrafoD {
 
 	}
 
-	/**
-	 * Devuelve el grado saliente 
-	 * del nodo especificado
-	 * @param nodo String del nodo al que se le busca el grado saliente
-	 * @return La cantidad de arista que salen de ese nodo
-	 */
-	public java.lang.Integer getGradoSaliente(java.lang.String nodo) {
-
-		java.lang.Integer result = 0;
-
-		for (Nodo n : this.Nodos) {
-
-			if (n.getNombre().equals(nodo)) {
-
-				for (Arista a : this.Aristas) {
-					if (a.getNInicio().getNombre().equals(nodo)) {
-
-						result += 1;
-
-					}
-
-				}
-				break;
-
-			}
-
-		}
-		return result;
-	}
-
-	/**
-	 * Devuelve el grado entrante
-	 * del nodo especificado
-	 * @param nodo String del nodo al que se le busca el grado Entrante
-	 * @return La cantidad de arista que entran a ese nodo
-	 */
-	public java.lang.Integer getGradoEntrante(java.lang.String nodo) {
-
-		java.lang.Integer result = 0;
-
-		for (Nodo n : this.Nodos) {
-
-			if (n.getNombre().equals(nodo)) {
-
-				for (Arista a : this.Aristas) {
-					if (a.getNFinal().getNombre().equals(nodo)) {
-
-						result += 1;
-
-					}
-
-				}
-				break;
-
-			}
-
-		}
-		return result;
-	}
-
 
 
 	/**
-	 * A�ade una arista al
+	 * Añade una arista al
 	 * nodo que se busca dentro de la 
 	 * lista de nodos del grafo dirigido
 	 * @param nodoInicio Nodo al que se le desea a�adir la arista
